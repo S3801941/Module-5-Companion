@@ -16,8 +16,7 @@ Hints:
 import requests
 from requests.auth import HTTPBasicAuth
 import json
-import base64
-import sys
+
 
 # Disable SSL warnings
 import urllib3
