@@ -12,6 +12,25 @@ Key Concepts:
 """
 
 # TODO: Import what you need
+import requests
+from requests.auth import HTTPBasicAuth
+import json
+
+
+# Disable SSL warnings
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+host = "devnetsandboxiosxec8k.cisco.com"
+
+port = 443
+
+auth = HTTPBasicAuth('admin', 'C1sco12345')
+
+headers = {"Accept": "application/yang-data+json",
+           "Content-Type": "application/yang-data+json"}
+
+
 
 def explore_yang_structure():
     """
@@ -24,7 +43,25 @@ def explore_yang_structure():
     
     Hint: Try each endpoint and see what data structure you get back!
     """
-    pass
+    endpoints = [
+        "/restconf/data/ietf-interfaces:interfaces",
+        "/restconf/data/Cisco-IOS-XE-native:native",
+        "/restconf/data/ietf-system:system-state" # Fails for some reason, but the Cisco one works. This is a good example of how different vendors can implement YANG models differently.
+    ]
+
+    for endpoint in endpoints:
+        url = f"https://{host}:{port}{endpoint}"
+        response = requests.get(url, auth=auth, headers=headers, verify=False, timeout=15)
+        print(f"\n{'=' * 40}")
+        print(f"Exploring YANG Path: {endpoint}")
+        print(f"Response Status Code: {response.status_code}")
+        if response.status_code == 200:
+            data = response.json()
+            print(json.dumps(data, indent=4))
+        else:
+            print(f"Failed to explore YANG path. Status Code: {response.status_code}, Response: {response.text}")
+
+    
 
 def find_interface_yang_paths():
     """
@@ -37,7 +74,24 @@ def find_interface_yang_paths():
     
     Question: What's the difference between config vs state data?
     """
-    pass
+    endpoints = [
+        "/restconf/data/ietf-interfaces:interfaces",
+        "/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet1",
+        "/restconf/data/ietf-interfaces:interfaces-state"
+    ]
+
+    for endpoint in endpoints:
+        url = f"https://{host}:{port}{endpoint}"
+        response = requests.get(url, auth=auth, headers=headers, verify=False, timeout=15)
+        print(f"\n{'=' * 40}")
+        print(f"Exploring Interface YANG Path: {endpoint}")
+        print(f"=" * 40)
+        print(f"Response Status Code: {response.status_code}")
+        if response.status_code == 200:
+            data = response.json()
+            print(json.dumps(data, indent=4))
+        else:
+            print(f"Failed to explore interface YANG path. Status Code: {response.status_code}, Response: {response.text}")
 
 def compare_yang_models():
     """
@@ -49,7 +103,24 @@ def compare_yang_models():
     
     Discussion: Why might there be multiple ways to get the same data?
     """
-    pass
+    endpoints = [
+        "/restconf/data/ietf-system:system-state/hostname", #IETF standard does not work for some reason, but the Cisco one does.
+        "/restconf/data/Cisco-IOS-XE-native:native/hostname"
+    ]
+
+    for endpoint in endpoints:
+        url = f"https://{host}:{port}{endpoint}"
+        response = requests.get(url, auth=auth, headers=headers, verify=False, timeout=15)
+        print(f"\n{'=' * 40}")
+        print(f"Comparing YANG Model Path: {endpoint}")
+        print(f"=" * 40)
+        print(f"Response Status Code: {response.status_code}")
+        if response.status_code == 200:
+            data = response.json()
+            details = data.get('ietf-system:hostname') or data.get('Cisco-IOS-XE-native:hostname')
+            print(f"Hostname from {endpoint}: {details}")
+        else:
+            print(f"Failed to compare YANG model. Status Code: {response.status_code}, Response: {response.text}")
 
 def build_yang_path_from_cli():
     """
@@ -62,7 +133,24 @@ def build_yang_path_from_cli():
     
     Hint: Use trial and error with different YANG paths!
     """
-    pass
+    endpoints = [
+        "/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet1",
+        "/restconf/data/ietf-interfaces:interfaces",
+        "/restconf/data/Cisco-IOS-XE-native:native/version"
+    ]
+
+    for endpoint in endpoints:
+        url = f"https://{host}:{port}{endpoint}"
+        response = requests.get(url, auth=auth, headers=headers, verify=False, timeout=15)
+        print(f"\n{'=' * 40}")
+        print(f"Exploring YANG Path for CLI Equivalent: {endpoint}")
+        print(f"=" * 40)
+        print(f"Response Status Code: {response.status_code}")
+        if response.status_code == 200:
+            data = response.json()
+            print(json.dumps(data, indent=4))
+        else:
+            print(f"Failed to explore YANG path. Status Code: {response.status_code}, Response: {response.text}")
 
 def yang_data_types_exploration():
     """
@@ -75,8 +163,33 @@ def yang_data_types_exploration():
     
     Hint: Look at the JSON structure from your requests!
     """
-    pass
+    endpoints = [
+        "/restconf/data/ietf-interfaces:interfaces",
+        "/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet1",
+        "/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet1/ietf-ip:ipv4",
+    ]
+
+    for endpoint in endpoints:
+        url = f"https://{host}:{port}{endpoint}"
+        response = requests.get(url, auth=auth, headers=headers, verify=False, timeout=15)
+        print(f"\n{'=' * 40}")
+        print(f"Exploring YANG Data Types at Path: {endpoint}")
+        print(f"=" * 40)
+        print(f"Response Status Code: {response.status_code}")
+        if response.status_code == 200:
+            data = response.json()
+            print(json.dumps(data, indent=4))
+        else:
+            print(f"Failed to explore YANG data types. Status Code: {response.status_code}, Response: {response.text}")
 
 # TODO: Create a main() function that calls these challenges
-
+def main():
+    explore_yang_structure()
+    find_interface_yang_paths()
+    compare_yang_models()
+    build_yang_path_from_cli()
+    yang_data_types_exploration()
 # TODO: Add error handling and user-friendly output
+
+if __name__ == "__main__":
+    main()

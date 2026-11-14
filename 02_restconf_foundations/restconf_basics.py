@@ -111,6 +111,7 @@ def get_interface_details(interface_name):
             print(f"Name: {interface['name']}")
             print(f"Type: {interface['type']}")
             print(f"Enabled: {interface['enabled']}")
+            # The following can be handled cleaner, but they require going deper inte nested dictionaries. For simplicity, we can use .get() with defaults.
             print(f"Description: {interface.get('description', 'No description')}")
             print(f"IPv4 Address: {interface.get('ietf-ip:ipv4', {}).get('address', 'No IPv4 address')}")
             print(f"IPv6 Address: {interface.get('ietf-ip:ipv6', {}).get('address', 'No IPv6 address')}")
