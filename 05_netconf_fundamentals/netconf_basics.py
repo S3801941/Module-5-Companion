@@ -17,6 +17,9 @@ Connection Info:
 """
 
 # TODO: Import ncclient and XML libraries
+import ncclient
+from ncclient import manager
+import xml.etree.ElementTree as ET
 
 def establish_netconf_session():
     """
@@ -30,7 +33,24 @@ def establish_netconf_session():
     
     Hint: Use context manager (with statement) for auto-cleanup!
     """
-    pass
+
+    connection_params = {
+        "host": "sandbox-iosxe-latest-1.cisco.com",
+        "port": 830,
+        "username": "s3801941",
+        "password": "vr%5rN66BdY*",
+        "hostkey_verify": False,
+        "device_params": {"name": "iosxe"}
+    }
+
+    with manager.connect_ssh(**connection_params) as m:
+        print("NETCONF session established!")
+        # Optional: Print server capabilities
+        print("Server Capabilities:")
+        server_capabilities = m.server_capabilities
+        for cap in server_capabilities:
+            print(cap)
+
 
 def explore_device_capabilities():
     """
@@ -43,7 +63,20 @@ def explore_device_capabilities():
     
     Question: How do capabilities differ from RESTCONF discovery?
     """
-    pass
+    connection_params = {
+        "host": "sandbox-iosxe-latest-1.cisco.com",
+        "port": 830,
+        "username": "s3801941",
+        "password": "vr%5rN66BdY*",
+        "hostkey_verify": False,
+        "device_params": {"name": "iosxe"}
+    }
+
+    with manager.connect_ssh(**connection_params) as m:
+        print("Exploring device capabilities...")
+        server_capabilities = m.server_capabilities
+        for cap in server_capabilities:
+            print(cap)
 
 def get_configuration_data():
     """
@@ -99,5 +132,29 @@ def compare_netconf_vs_restconf():
     pass
 
 # TODO: Build a comprehensive main() function
+def main():
+
+    # Establish NETCONF session
+    establish_netconf_session()
+
+    # Explore device capabilities
+    explore_device_capabilities()
+
+    # Get configuration data
+    get_configuration_data()
+
+    # Get operational data
+    get_operational_data()
+
+    # Parse XML responses
+    parse_xml_responses()
+
+    # Compare NETCONF vs RESTCONF
+    compare_netconf_vs_restconf()
 
 # TODO: Add robust error handling for network issues
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print(f"An error occurred: {e}")

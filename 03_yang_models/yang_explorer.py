@@ -25,7 +25,7 @@ host = "devnetsandboxiosxec8k.cisco.com"
 
 port = 443
 
-auth = HTTPBasicAuth('admin', 'C1sco12345')
+auth = HTTPBasicAuth('s3801941', 'vr%5rN66BdY*')
 
 headers = {"Accept": "application/yang-data+json",
            "Content-Type": "application/yang-data+json"}
