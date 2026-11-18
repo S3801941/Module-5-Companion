@@ -26,11 +26,11 @@ import json
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-host = "devnetsandboxiosxec9k.cisco.com"
+host = "devnetsandboxiosxec8k.cisco.com"
 
 port = 443
 
-auth = HTTPBasicAuth('s3801941', 'vr%5rN66BdY*')
+auth = HTTPBasicAuth('admin', 'C1sco12345')
 
 headers = {"Accept": "application/yang-data+json",
            "Content-Type": "application/yang-data+json"}
@@ -99,7 +99,7 @@ def enable_disable_interface():
     
     WARNING: Be careful - this affects network connectivity!
     """
-    endpoint = "/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet1/enabled"
+    endpoint = "/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet3/enabled"
     new_status = False  # Change to True to enable, False to disable
     interface_data = {
         "ietf-interfaces:enabled": new_status
@@ -110,7 +110,7 @@ def enable_disable_interface():
     print(f"Response Status Code: {response.status_code}")
     if response.status_code in [200, 204]:
         status_str = "enabled" if new_status else "disabled"
-        print(f"Successfully {status_str} GigabitEthernet1")
+        print(f"Successfully {status_str} GigabitEthernet3")
     else:
         print(f"Failed to change interface status. Status Code: {response.status_code}, Response: {response.text}")
 
@@ -127,7 +127,25 @@ def bulk_configuration_change():
     
     Hint: Send complete interface object with all properties
     """
-    pass
+
+    endpoint = "/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet3"
+    new_config = {
+        "ietf-interfaces:interface": {
+            "name": "GigabitEthernet3",
+            "description": "Bulk update via RESTCONF",
+            "enabled": True,
+            "type": "iana-if-type:ethernetCsmacd",
+            "mtu": 1500
+        }
+    }
+
+    url = f"https://{host}:{port}{endpoint}"
+    response = requests.put(url, auth=auth, headers=headers, data=json.dumps(new_config), verify=False, timeout=15)
+    print(f"Response Status Code: {response.status_code}")
+    if response.status_code in [200, 204]:
+        print(f"Successfully updated GigabitEthernet3 with new configuration.")
+    else:
+        print(f"Failed to update configuration. Status Code: {response.status_code}, Response: {response.text}")
 
 def configuration_rollback():
     """
@@ -140,7 +158,35 @@ def configuration_rollback():
     
     Hint: Store the original data from your GET request!
     """
-    pass
+    # Step 1: Read current configuration
+    endpoint = "/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet3"
+    url = f"https://{host}:{port}{endpoint}"
+    response = requests.get(url, auth=auth, headers=headers, verify=False, timeout=15)
+    if response.status_code == 200:
+        original_config = response.json()
+        print(f"Original configuration saved for rollback.")
+    else:
+        print(f"Failed to read original configuration. Status Code: {response.status_code}, Response: {response.text}")
+        return
+
+    # Step 2: Make a change (disable the interface)
+    new_status = False
+    interface_data = {
+        "ietf-interfaces:enabled": new_status
+    }
+    response = requests.put(url, auth=auth, headers=headers, data=json.dumps(interface_data), verify=False, timeout=15)
+    if response.status_code in [200, 204]:
+        print(f"Successfully disabled GigabitEthernet3 for testing rollback.")
+    else:
+        print(f"Failed to disable interface. Status Code: {response.status_code}, Response: {response.text}")
+        return
+
+    # Step 3: Restore original configuration
+    response = requests.put(url, auth=auth, headers=headers, data=json.dumps(original_config), verify=False, timeout=15)
+    if response.status_code in [200, 204]:
+        print(f"Successfully rolled back to original configuration for GigabitEthernet3.")
+    else:
+        print(f"Failed to rollback configuration. Status Code: {response.status_code}, Response: {response.text}")
 
 def error_handling_and_validation():
     """
@@ -154,7 +200,29 @@ def error_handling_and_validation():
     
     Hint: Check response status codes and error messages!
     """
-    pass
+
+    interface_name = "GigabitEthernet999"  # Invalid interface
+    endpoint = f"/restconf/data/ietf-interfaces:interfaces/interface=GigabitEthernet3"
+    interface_config_data = {
+        "ietf-interfaces:interface": {
+            "name": interface_name,
+            "description": "Testing error handling",
+            "enabled": True,
+            "type": "iana-if-type:ethernetCsmacd"
+        }
+    }
+
+    int_no_enable_or_disable = {
+        "ietf-interfaces:interface": {
+            "name": "GigabitEthernet3",
+            "description": "Testing error handling",
+            "enabled": "Unsure",  # Invalid value
+            "type": "iana-if-type:ethernetCsmacd"
+        }
+    }
+
+    
+
 
 # TODO: Create main() function with step-by-step configuration workflow
 def main():
@@ -168,7 +236,7 @@ def main():
     #enable_disable_interface()
     
     # Step 4: Bulk configuration change
-    #bulk_configuration_change()
+    bulk_configuration_change()
     
     # Step 5: Rollback changes if needed
     #configuration_rollback()

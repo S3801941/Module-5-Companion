@@ -17,6 +17,7 @@ Connection Info:
 """
 
 # TODO: Import ncclient and XML libraries
+
 import ncclient
 from ncclient import manager
 import xml.etree.ElementTree as ET
@@ -35,7 +36,7 @@ def establish_netconf_session():
     """
 
     connection_params = {
-        "host": "sandbox-iosxe-latest-1.cisco.com",
+        "host": "devnetsandboxiosxec8k.cisco.com",
         "port": 830,
         "username": "s3801941",
         "password": "vr%5rN66BdY*",
@@ -64,7 +65,7 @@ def explore_device_capabilities():
     Question: How do capabilities differ from RESTCONF discovery?
     """
     connection_params = {
-        "host": "sandbox-iosxe-latest-1.cisco.com",
+        "host": "devnetsandboxiosxec8k.cisco.com",
         "port": 830,
         "username": "s3801941",
         "password": "vr%5rN66BdY*",
@@ -138,19 +139,19 @@ def main():
     establish_netconf_session()
 
     # Explore device capabilities
-    explore_device_capabilities()
+    #explore_device_capabilities()
 
     # Get configuration data
-    get_configuration_data()
+    #get_configuration_data()
 
     # Get operational data
-    get_operational_data()
+    #get_operational_data()
 
     # Parse XML responses
-    parse_xml_responses()
+    #parse_xml_responses()
 
     # Compare NETCONF vs RESTCONF
-    compare_netconf_vs_restconf()
+    #compare_netconf_vs_restconf()
 
 # TODO: Add robust error handling for network issues
 if __name__ == "__main__":
